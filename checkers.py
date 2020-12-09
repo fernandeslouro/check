@@ -42,6 +42,17 @@ def winner(state):
             if (piece in ['o', 'x']) and (len(taken_positions) != 0):
                 return piece
 
+def get_user_move():
+    move = []
+    submove = (0,0)
+    while 1:  
+        submove = input('Sub-move:')
+        if submove == '':
+            return move
+        submove = tuple(int(x.strip()) for x in submove.split(','))
+        move.append(submove)
+    return move
+    
 def computer_play(state, piece):
     return move
 
@@ -60,6 +71,7 @@ while not game_over(state):
         break
 
     #play player
+    move = get_user_move()
 
 
 
