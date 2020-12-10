@@ -60,6 +60,22 @@ def update_board(state, move, piece):
     return state
 
 
+def is_valid_submove(state, submove, piece):
+    # check if piece to move is actually a piece
+    if submove(0) not in state[piece]:
+        return False
+    # check if place to move to is empty
+    if submove(1) not in state['-']:
+        return False
+    return True
+
+def update_board_submove(state, submove, piece):
+    state['piece'].pop(submove(0))
+    state['piece'].append(submove(0))
+    return state
+
+
+
 # starting game
 state = initial_game()
 print(state)
