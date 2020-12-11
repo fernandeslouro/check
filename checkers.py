@@ -14,6 +14,15 @@
  - Dictionary with keys 'x', 'o', '-'
  - Values are a list of the positions taken by each type of piece
 
+ x . x . x . x .
+ . x . x . x . x
+ x . x . x . x .
+ . - . - . - . -
+ - . - . - . - .
+ . o . o . o . o
+ o . o . o . o .
+ . o . o . o . o
+
 
 == Moves ==
  - Moves are lists of tuples (lists because a move can have several sub-moves)
@@ -57,7 +66,18 @@ def computer_play(state, piece):
     return move
 
 def update_board(state, move, piece):
+    for submove in move:
+        state = update_board_submove(state, submove, piece)
     return state
+
+def is_valid_move(state, move, piece):
+    hyp_state = state
+    for submove in move:
+        if is_valid_submove(hyp_state, submove, piece):
+            hyp_state = update_board_submove(hyp_state, submove, piece)
+        else:
+            return False
+    return True
 
 
 def is_valid_submove(state, submove, piece):
@@ -67,11 +87,13 @@ def is_valid_submove(state, submove, piece):
     # check if place to move to is empty
     if submove(1) not in state['-']:
         return False
+
+
     return True
 
 def update_board_submove(state, submove, piece):
     state['piece'].pop(submove(0))
-    state['piece'].append(submove(0))
+    state['piece'].append(submove(1))
     return state
 
 
