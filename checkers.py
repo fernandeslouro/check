@@ -1,14 +1,14 @@
 '''
 == Board Positions ==
 
- 1 . 2 . 3 . 4 .
- . 5 . 6 . 7 . 8
-10 .11 .12 .13 .
- .14 .15 .16 .17
-19 .20 .21 .22 .
- .23 .24 .25 .26
-28 .29 .30 .31 .
- .32 .33 .34 .35
+ . 1 . 2 . 3 . 4
+ 5 . 6 . 7 . 8 .
+ .10 .11 .12 .13
+14 .15 .16 .17 .
+ .19 .20 .21 .22
+23 .24 .25 .26 .
+ .28 .29 .30 .31
+32 .33 .34 .35 .
 
 == Board State Representation
  - Dictionary with keys 'x', 'o', '-'
@@ -63,8 +63,8 @@ def get_user_move():
     return move
     
 def computer_play(state, piece):
+    move = [(10, 15)]
     return move
-
 def update_board(state, move, piece):
     for submove in move:
         state = update_board_submove(state, submove, piece)
@@ -79,38 +79,84 @@ def is_valid_move(state, move, piece):
             return False
     return True
 
+def opponent_piece(piece):
+    if piece =='x':
+        return 'o'
+    if piece == 'o':
+        return 'x'
+
 
 def is_valid_submove(state, submove, piece):
     # check if piece to move is actually a piece
-    if submove(0) not in state[piece]:
+    if submove[0] not in state[piece]:
         return False
     # check if place to move to is empty
-    if submove(1) not in state['-']:
+    if submove[1] not in state['-']:
         return False
+    sign = []
+    if piece == 'x':
+        sign.append(1)
+    if piece == 'o':
+        sign.append(-1)
+    if 'k' in piece:
+        sign = [-1, 1]
+    
+    for s in sign:
+        if submove[1] == submove[0]+s*4  and submove[0]+s*4 %9 != 0: 
+            return True
+        if submove[1] == submove[0]+s*5  and submove[0]+s*5 %9 != 0: 
+            return True
+        if submove[1] == submove[0]+s*8 and submove[0]+s*10 %9 != 0:
+            return True
+        if submove[1] == submove[0]+sign*10 and submove[0]+sign*10 %9 != 0:
+            return True
+    return False
 
 
-    return True
+def get_piece_from_position(state, position):
+    for piece, places in state.items():
+        if position in places:
+            return piece
+
+def draw_board(state):
+    nl = '\n' 
+    print(f'\
+     . {get_piece_from_position(state, 1)} . {get_piece_from_position(state, 2)} . {get_piece_from_position(state, 3)} . {get_piece_from_position(state, 4)}{nl}\
+     {get_piece_from_position(state, 5)} . {get_piece_from_position(state, 6)} . {get_piece_from_position(state, 7)} . {get_piece_from_position(state, 8)} .{nl}\
+     .{get_piece_from_position(state, 10)} .{get_piece_from_position(state, 11)} .{get_piece_from_position(state, 12)} .{get_piece_from_position(state, 13)}{nl}\
+    {get_piece_from_position(state, 14)} .{get_piece_from_position(state, 15)} .{get_piece_from_position(state, 16)} .{get_piece_from_position(state, 17)} .{nl}\
+     .{get_piece_from_position(state, 19)} .{get_piece_from_position(state, 20)} .{get_piece_from_position(state, 21)} .{get_piece_from_position(state, 22)}{nl}\
+    {get_piece_from_position(state, 23)} .{get_piece_from_position(state, 24)} .{get_piece_from_position(state, 25)} .{get_piece_from_position(state, 26)} .{nl}\
+     .{get_piece_from_position(state, 28)} .{get_piece_from_position(state, 29)} .{get_piece_from_position(state, 30)} .{get_piece_from_position(state, 31)}{nl}\
+    {get_piece_from_position(state, 32)} .{get_piece_from_position(state, 33)} .{get_piece_from_position(state, 34)} .{get_piece_from_position(state, 35)} .{nl}\
+    ')
+
+
 
 def update_board_submove(state, submove, piece):
-    state['piece'].pop(submove(0))
-    state['piece'].append(submove(1))
+    state[piece].pop(submove[0])
+    state[piece].append(submove[1])
     return state
 
 
 
 # starting game
 state = initial_game()
-print(state)
+draw_board(state)
 while not game_over(state):
 
     #play computer - ninitially computer will be x piece
-    computer_play(state, 'x')
+    move = computer_play(state, 'x')
+    if is_valid_move(state, move, 'x'):
+        state = update_board(state, move, 'x')
     if game_over(state):
         break
 
+    draw_board(state)
     #play player
     move = get_user_move()
-
+    if is_valid_move(state, move, 'o'):
+        state = update_board(state, move, 'o')
 
 
 print(f'The winner is {winner(state)}')
