@@ -65,8 +65,11 @@ def get_user_move():
 def computer_play(state, piece):
     move = [(10, 15)]
     return move
+
 def update_board(state, move, piece):
+    print(move)
     for submove in move:
+        print(submove)
         state = update_board_submove(state, submove, piece)
     return state
 
@@ -123,40 +126,45 @@ def draw_board(state):
     print(f'\
      . {get_piece_from_position(state, 1)} . {get_piece_from_position(state, 2)} . {get_piece_from_position(state, 3)} . {get_piece_from_position(state, 4)}{nl}\
      {get_piece_from_position(state, 5)} . {get_piece_from_position(state, 6)} . {get_piece_from_position(state, 7)} . {get_piece_from_position(state, 8)} .{nl}\
-     .{get_piece_from_position(state, 10)} .{get_piece_from_position(state, 11)} .{get_piece_from_position(state, 12)} .{get_piece_from_position(state, 13)}{nl}\
-    {get_piece_from_position(state, 14)} .{get_piece_from_position(state, 15)} .{get_piece_from_position(state, 16)} .{get_piece_from_position(state, 17)} .{nl}\
-     .{get_piece_from_position(state, 19)} .{get_piece_from_position(state, 20)} .{get_piece_from_position(state, 21)} .{get_piece_from_position(state, 22)}{nl}\
-    {get_piece_from_position(state, 23)} .{get_piece_from_position(state, 24)} .{get_piece_from_position(state, 25)} .{get_piece_from_position(state, 26)} .{nl}\
-     .{get_piece_from_position(state, 28)} .{get_piece_from_position(state, 29)} .{get_piece_from_position(state, 30)} .{get_piece_from_position(state, 31)}{nl}\
-    {get_piece_from_position(state, 32)} .{get_piece_from_position(state, 33)} .{get_piece_from_position(state, 34)} .{get_piece_from_position(state, 35)} .{nl}\
+     . {get_piece_from_position(state, 10)} . {get_piece_from_position(state, 11)} . {get_piece_from_position(state, 12)} . {get_piece_from_position(state, 13)}{nl}\
+    {get_piece_from_position(state, 14)} . {get_piece_from_position(state, 15)} . {get_piece_from_position(state, 16)} . {get_piece_from_position(state, 17)} .{nl}\
+     . {get_piece_from_position(state, 19)} . {get_piece_from_position(state, 20)} . {get_piece_from_position(state, 21)} . {get_piece_from_position(state, 22)}{nl}\
+    {get_piece_from_position(state, 23)} . {get_piece_from_position(state, 24)} . {get_piece_from_position(state, 25)} . {get_piece_from_position(state, 26)} .{nl}\
+     . {get_piece_from_position(state, 28)} . {get_piece_from_position(state, 29)} . {get_piece_from_position(state, 30)} . {get_piece_from_position(state, 31)}{nl}\
+    {get_piece_from_position(state, 32)} . {get_piece_from_position(state, 33)} . {get_piece_from_position(state, 34)} . {get_piece_from_position(state, 35)} .{nl}\
     ')
 
 
 
 def update_board_submove(state, submove, piece):
-    state[piece].pop(submove[0])
+    print('a')
+    print(state)
+    state[piece].remove(submove[0])
+    state['-'].append(submove[0])
     state[piece].append(submove[1])
+    state['-'].remove(submove[1])
+    print('b')
     return state
 
 
 
 # starting game
 state = initial_game()
-draw_board(state)
-while not game_over(state):
+draw_board(board)
+while not game_over(board):
 
     #play computer - ninitially computer will be x piece
-    move = computer_play(state, 'x')
-    if is_valid_move(state, move, 'x'):
-        state = update_board(state, move, 'x')
-    if game_over(state):
+    move = computer_play(board, 'x')
+    if is_valid_move(board, move, 'x'):
+        state = update_board(board, move, 'x')
+    if game_over(board):
         break
 
-    draw_board(state)
+    draw_board(board)
     #play player
     move = get_user_move()
-    if is_valid_move(state, move, 'o'):
-        state = update_board(state, move, 'o')
+    if is_valid_move(board, move, 'o'):
+        state = update_board(board, move, 'o')
 
 
-print(f'The winner is {winner(state)}')
+print(f'The winner is {winner(board)}')
