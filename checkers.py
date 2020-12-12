@@ -1,3 +1,4 @@
+import random
 '''
 == Board Positions ==
 
@@ -63,13 +64,13 @@ def get_user_move():
     return move
     
 def computer_play(state, piece):
-    move = [(10, 15)]
-    return move
+    while True:
+        move = [(random.choice(state['x']), random.choice(state['-']))]
+        if is_valid_move(state, move, piece):
+            return move
 
 def update_board(state, move, piece):
-    print(move)
     for submove in move:
-        print(submove)
         state = update_board_submove(state, submove, piece)
     return state
 
@@ -82,7 +83,7 @@ def is_valid_move(state, move, piece):
             return False
     return True
 
-def opponent_piece(piece):
+def opponent(piece):
     if piece =='x':
         return 'o'
     if piece == 'o':
@@ -105,14 +106,14 @@ def is_valid_submove(state, submove, piece):
         sign = [-1, 1]
     
     for s in sign:
-        if submove[1] == submove[0]+s*4  and submove[0]+s*4 %9 != 0: 
-            return True
-        if submove[1] == submove[0]+s*5  and submove[0]+s*5 %9 != 0: 
-            return True
-        if submove[1] == submove[0]+s*8 and submove[0]+s*10 %9 != 0:
-            return True
-        if submove[1] == submove[0]+sign*10 and submove[0]+sign*10 %9 != 0:
-            return True
+        for diff in [4,5]:
+            if submove[1] == submove[0]+s*diff  and submove[0]+s*diff %9 != 0: 
+                return True
+            if submove[1] == submove[0]+s*2*diff and\
+                (submove[0]+diff in state[opponent(piece)]) and\
+                submove[0]+s*diff %9 != 0 and\
+                submove[0]+s*2*diff %9 != 0:
+                return True
     return False
 
 
@@ -121,46 +122,60 @@ def get_piece_from_position(state, position):
         if position in places:
             return piece
 
+
+
+
+
+
+
+
+
+
+
+
+
 def draw_board(state):
     nl = '\n' 
     print(f'\
-     . {get_piece_from_position(state, 1)} . {get_piece_from_position(state, 2)} . {get_piece_from_position(state, 3)} . {get_piece_from_position(state, 4)}{nl}\
-     {get_piece_from_position(state, 5)} . {get_piece_from_position(state, 6)} . {get_piece_from_position(state, 7)} . {get_piece_from_position(state, 8)} .{nl}\
-     . {get_piece_from_position(state, 10)} . {get_piece_from_position(state, 11)} . {get_piece_from_position(state, 12)} . {get_piece_from_position(state, 13)}{nl}\
-    {get_piece_from_position(state, 14)} . {get_piece_from_position(state, 15)} . {get_piece_from_position(state, 16)} . {get_piece_from_position(state, 17)} .{nl}\
-     . {get_piece_from_position(state, 19)} . {get_piece_from_position(state, 20)} . {get_piece_from_position(state, 21)} . {get_piece_from_position(state, 22)}{nl}\
-    {get_piece_from_position(state, 23)} . {get_piece_from_position(state, 24)} . {get_piece_from_position(state, 25)} . {get_piece_from_position(state, 26)} .{nl}\
-     . {get_piece_from_position(state, 28)} . {get_piece_from_position(state, 29)} . {get_piece_from_position(state, 30)} . {get_piece_from_position(state, 31)}{nl}\
-    {get_piece_from_position(state, 32)} . {get_piece_from_position(state, 33)} . {get_piece_from_position(state, 34)} . {get_piece_from_position(state, 35)} .{nl}\
+     . {get_piece_from_position(state, 1)} . {get_piece_from_position(state, 2)} . {get_piece_from_position(state, 3)} . {get_piece_from_position(state, 4)}     . 1 . 2 . 3 . 4{nl}\
+     {get_piece_from_position(state, 5)} . {get_piece_from_position(state, 6)} . {get_piece_from_position(state, 7)} . {get_piece_from_position(state, 8)} .     5 . 6 . 7 . 8 .{nl}\
+     . {get_piece_from_position(state, 10)} . {get_piece_from_position(state, 11)} . {get_piece_from_position(state, 12)} . {get_piece_from_position(state, 13)}     .10 .11 .12 .13{nl}\
+    {get_piece_from_position(state, 14)} . {get_piece_from_position(state, 15)} . {get_piece_from_position(state, 16)} . {get_piece_from_position(state, 17)}       14 .15 .16 .17 .   {nl}\
+     . {get_piece_from_position(state, 19)} . {get_piece_from_position(state, 20)} . {get_piece_from_position(state, 21)} . {get_piece_from_position(state, 22)}     .19 .20 .21 .22{nl}\
+    {get_piece_from_position(state, 23)} . {get_piece_from_position(state, 24)} . {get_piece_from_position(state, 25)} . {get_piece_from_position(state, 26)} .     23 .24 .25 .26 .{nl}\
+     . {get_piece_from_position(state, 28)} . {get_piece_from_position(state, 29)} . {get_piece_from_position(state, 30)} . {get_piece_from_position(state, 31)}     .28 .29 .30 .31{nl}\
+    {get_piece_from_position(state, 32)} . {get_piece_from_position(state, 33)} . {get_piece_from_position(state, 34)} . {get_piece_from_position(state, 35)} .     32 .33 .34 .35 .{nl}\
     ')
 
 
 
 def update_board_submove(state, submove, piece):
-    print('a')
-    print(state)
+    state[piece].append(submove[1])
     state[piece].remove(submove[0])
     state['-'].append(submove[0])
-    state[piece].append(submove[1])
     state['-'].remove(submove[1])
-    print('b')
     return state
 
 
 
 # starting game
-state = initial_game()
-draw_board(board)
-while not game_over(board):
 
+board = initial_game()
+while not game_over(board):
+    
+    draw_board(board)
     #play computer - ninitially computer will be x piece
     move = computer_play(board, 'x')
     if is_valid_move(board, move, 'x'):
         state = update_board(board, move, 'x')
+
+    print('==== COMPUTER HAS PLAYED ===')
+    draw_board(board)
+
     if game_over(board):
         break
 
-    draw_board(board)
+    print('==== YOUR MOVE ===')
     #play player
     move = get_user_move()
     if is_valid_move(board, move, 'o'):
