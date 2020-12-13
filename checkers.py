@@ -1,5 +1,6 @@
 import random
 import copy
+import numpy as np
 '''
 == Board Positions ==
 
@@ -111,8 +112,7 @@ def is_valid_submove(state, submove, piece):
             if submove[1] == submove[0]+s*diff  and submove[0]+s*diff %9 != 0: 
                 return True
             if submove[1] == submove[0]+s*2*diff and\
-                (submove[0]+diff in state[opponent(piece)]) and\
-                submove[0]+s*diff %9 != 0 and\
+                (submove[0]+s*diff in state[opponent(piece)]) and\
                 submove[0]+s*2*diff %9 != 0:
                 return True
     return False
@@ -140,11 +140,15 @@ def draw_board(state):
 
 
 def update_board_submove(state, submove, piece):
-    print(state)
     state[piece].append(submove[1])
     state[piece].remove(submove[0])
     state['-'].append(submove[0])
     state['-'].remove(submove[1])
+    if abs(submove[0]-submove[1]) in [8,10]:
+        print(int((submove[0]+submove[1])/2))
+        state[opponent(piece)].remove(int((submove[0]+submove[1])/2))
+        state['-'].append(int((submove[0]+submove[1])/2))
+
     return state
 
 
