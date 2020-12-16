@@ -78,6 +78,8 @@ def update_board(state, move, piece):
 
 def is_valid_move(state, move, piece):
     hyp_state = copy.deepcopy(state)
+    if len(move) == 0:
+        return False
     for submove in move:
         if is_valid_submove(hyp_state, submove, piece):
             hyp_state = update_board_submove(hyp_state, submove, piece)
@@ -148,9 +150,20 @@ def update_board_submove(state, submove, piece):
         print(int((submove[0]+submove[1])/2))
         state[opponent(piece)].remove(int((submove[0]+submove[1])/2))
         state['-'].append(int((submove[0]+submove[1])/2))
-
+    if check_new_king(state, submove, piece):
+        state[piece].remove(submove[1])
+        state['k'+piece].append(submove[1])
     return state
 
+
+
+def check_new_king(state, submove, piece):
+    if piece == 'o' and submove[1] in [1, 2, 3, 4]:
+        return True
+    elif piece == 'x' and submove[1] in [32, 33, 34, 35]:
+        return True
+    else:
+        return False
 
 
 # starting game
