@@ -38,11 +38,13 @@ def initial_game():
     state['x'] = [x for x in range(1,14) if x%9 != 0]
     state['-'] = [x for x in range(14,23) if x%9 != 0]
     state['o'] = [x for x in range(23,36) if x%9 != 0]
+    state['kx'] = []
+    state['ko'] = []
     return state
 
 def game_over(state):
-    for piece, taken_positions in state.items():
-        if (piece in ['o', 'x']) and (len(taken_positions) == 0):
+    for p in ['x', 'o']:
+        if len(state[p])+len(state[f'k{p}']) == 0:
             return True
     return False
 
@@ -54,20 +56,29 @@ def winner(state):
             if (piece in ['o', 'x']) and (len(taken_positions) != 0):
                 return piece
 
-def get_user_move():
+def get_user_move(state):
     move = []
     submove = (0,0)
     while 1:  
         submove = input('Sub-move:')
         if submove == '':
+            if len(move)==0:
+                return computer_play(state, 'o')
             return move
         submove = tuple(int(x.strip()) for x in submove.split(','))
         move.append(submove)
+
     return move
     
 def computer_play(state, piece):
     while True:
-        move = [(random.choice(state['x']), random.choice(state['-']))]
+        if random.randint(0,1):
+            move = [(random.choice(state[piece]), random.choice(state['-']))]
+        else:
+            try:
+                move = [(random.choice(state[f'k{piece}']), random.choice(state['-']))]
+            except:
+                continue 
         if is_valid_move(state, move, piece):
             return move
 
@@ -88,14 +99,15 @@ def is_valid_move(state, move, piece):
     return True
 
 def opponent(piece):
-    if piece =='x':
+    if 'x' in piece:
         return 'o'
-    if piece == 'o':
+    if 'o' in piece:
         return 'x'
 
 
 def is_valid_submove(state, submove, piece):
     # check if piece to move is actually a piece
+    #if submove[0] not in (state[piece]+state[f'k{piece}']):
     if submove[0] not in state[piece]:
         return False
     # check if place to move to is empty
@@ -108,7 +120,6 @@ def is_valid_submove(state, submove, piece):
         sign.append(-1)
     if 'k' in piece:
         sign = [-1, 1]
-    
     for s in sign:
         for diff in [4,5]:
             if submove[1] == submove[0]+s*diff  and submove[0]+s*diff %9 != 0: 
@@ -123,7 +134,16 @@ def is_valid_submove(state, submove, piece):
 def get_piece_from_position(state, position):
     for piece, places in state.items():
         if position in places:
-            return piece
+            if piece == 'ko':
+                return '\033[1m' + '\033[96m' + '\033[4m' +piece[1] + '\033[0m'
+            elif piece == 'o':
+                return '\033[1m' + '\033[96m' + piece + '\033[0m'
+            elif piece == 'kx':
+                return '\033[1m' + '\033[91m' + '\033[4m' +piece[1] + '\033[0m'
+            elif piece == 'x':
+                return '\033[1m' + '\033[91m' + piece + '\033[0m'
+            else:
+                return piece
 
 
 def draw_board(state):
@@ -147,7 +167,6 @@ def update_board_submove(state, submove, piece):
     state['-'].append(submove[0])
     state['-'].remove(submove[1])
     if abs(submove[0]-submove[1]) in [8,10]:
-        print(int((submove[0]+submove[1])/2))
         state[opponent(piece)].remove(int((submove[0]+submove[1])/2))
         state['-'].append(int((submove[0]+submove[1])/2))
     if check_new_king(state, submove, piece):
@@ -173,21 +192,23 @@ while not game_over(board):
     
     draw_board(board)
     #play computer - ninitially computer will be x piece
-    move = computer_play(board, 'x')
-    if is_valid_move(board, move, 'x'):
-        state = update_board(board, move, 'x')
+    if random.randint(0,1):
+        computer_played_board = 'kx'
+    else:
+        computer_played_piece = 'x'
 
+    move = computer_play(board, 'x')
+    state = update_board(board, move, 'x')
     print('==== COMPUTER HAS PLAYED ===')
     draw_board(board)
-
     if game_over(board):
         break
-
     #play player
     while not is_valid_move(board, move, 'o'):
         print('==== YOUR MOVE ===')
-        move = get_user_move()
-
+        move = get_user_move(board)
+    
+    #move = computer_play(board, 'o')
     board = update_board(board, move, 'o')
 
 print(f'The winner is {winner(board)}')
